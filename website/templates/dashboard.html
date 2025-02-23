@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h2>Dashboard</h2>
+    <br><br>
+    
+    <div class="row">
+        <!-- Gráfico de Clientes por Ciudad -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Clientes por Ciudad</h5>
+                    <canvas id="cityChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Gráfico de Registros Mensuales -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Registros Mensuales</h5>
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Incluir Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Gráfico de Ciudades
+    const cityCtx = document.getElementById('cityChart').getContext('2d');
+    new Chart(cityCtx, {
+        type: 'pie',
+        data: {
+            labels: {{ cities|safe }},
+            datasets: [{
+                data: {{ city_counts|safe }},
+                backgroundColor: [
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56',
+                    '#4BC0C0',
+                    '#9966FF'
+                ]
+            }]
+        }
+    });
+
+    // Gráfico Mensual
+    const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+    new Chart(monthlyCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ months|safe }},
+            datasets: [{
+                label: 'Registros por Mes',
+                data: {{ monthly_counts|safe }},
+                backgroundColor: '#36A2EB'
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+<br/><br/>
+<a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
+<br/><br/>
+{% endblock %}
