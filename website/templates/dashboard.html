@@ -26,6 +26,14 @@
         </div>
     </div>
 </div>
+<div class="col-md-12 mt-4">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Tendencia de Crecimiento</h5>
+            <canvas id="trendChart"></canvas>
+        </div>
+    </div>
+</div>
 
 <!-- Incluir Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -70,6 +78,21 @@
             }
         }
     });
+    // Gráfico de tendencia
+    const trendCtx = document.getElementById('trendChart').getContext('2d');
+    new Chart(trendCtx, {
+    type: 'line',
+    data: {
+        labels: {{ months|safe }},
+        datasets: [{
+            label: 'Crecimiento de Clientes',
+            data: {{ monthly_counts|safe }},
+            borderColor: '#4BC0C0',
+            tension: 0.1
+            }]
+        }
+    });
+
 </script>
 <br/><br/>
 <a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
