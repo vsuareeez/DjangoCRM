@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario de Eventos</title>
+
+    <!-- Bootstrap y FullCalendar -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@3.2.0/dist/fullcalendar.min.css" rel="stylesheet">
+
+    <!-- Estilos personalizados -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+
+        #calendar {
+            margin-top: 20px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <!-- Título y botón de agregar evento -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Calendario de Eventos</h1>
+            <a href="{% url 'add_event' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Agregar Evento
+            </a>
+        </div>
+
+        <!-- Calendario -->
+        <div id="calendar"></div>
+    </div>
+
+    <!-- Bootstrap, jQuery y FullCalendar -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@3.2.0/dist/fullcalendar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script para cargar el calendario -->
+    <script>
+        $(document).ready(function () {
+            $('#calendar').fullCalendar({
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,agendaWeek,agendaDay'
+                },
+                events: {{ events|safe }}, // Cargar eventos desde Django
+                dayClick: function (date, jsEvent, view) {
+                    var fecha = date.format();
+                    if (confirm('¿Has fumado este día?')) {
+                        window.location.href = "{% url 'add_event' %}?date=" + fecha;
+                    }
+                },
+                eventClick: function (calEvent, jsEvent, view) {
+                    alert('Evento: ' + calEvent.title);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
