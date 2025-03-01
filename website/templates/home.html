@@ -1,72 +1,206 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
+<div class="container-lg mt-4">
+    {% if user.is_authenticated %}
+    <!-- Si el usuario está autenticado, mostrar bienvenida y otras opciones -->
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">¡Bienvenido, {{ user.username }}!</h2>
+        <p class="lead">Tu sistema de gestión de clientes de confianza</p>
+    </div>
+    <!-- Carousel de Imágenes del Producto -->
+    <div class="container-lg mt-5">
+        <div class="text-center mb-5">
+            <h3 class="fw-bold">Tecnología de Vanguardia para tu Negocio</h3>
+            <p class="lead text">Descubre cómo DjangoCRM puede transformar tu gestión de clientes</p>
+        </div>
+        <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="{% static 'images/carousel2.jpg' %}" class="d-block w-100" alt="Imagen 2" height="590">
+                </div>
+                <div class="carousel-item">
+                    <img src="{% static 'images/carousel3.jpg' %}" class="d-block w-100" alt="Imagen 3" height="590">
+                </div>
+                <div class="carousel-item">
+                    <img src="{% static 'images/carousel4.jpg' %}" class="d-block w-100" alt="Imagen 3" height="590">
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Anterior</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Siguiente</span>
+            </button>
+        </div>
+    </div>
 
+    <!-- Sección de Tecnología -->
+    <div class="container-lg mt-5">
+        <div class="text-center mb-5">
+            <h3 class="fw-bold">Tecnología de Vanguardia para tu Negocio</h3>
+            <p class="lead">Descubre las herramientas que transformarán tu forma de gestionar clientes y ventas</p>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <div class="col">
+                <div class="card h-100 dark-card">
+                    <img src="{% static 'images/carousel1.jpg' %}" class="card-img-top" alt="Tecnología 1" height="260">
+                    <div class="card-body">
+                        <h5 class="card-title">Optimización</h5>
+                        <p class="card-text">Optimiza la gestión de ventas con herramientas tecnológicas modernas y
+                            eficaces.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 dark-card">
+                    <img src="{% static 'images/carousel5.jpg' %}" class="card-img-top" alt="Tecnología 2">
+                    <div class="card-body">
+                        <h5 class="card-title">Automatización</h5>
+                        <p class="card-text">Automatización de tareas que incrementan la productividad y reducen el
+                            margen
+                            de error.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100 dark-card">
+                    <img src="{% static 'images/carousel6.jpg' %}" class="card-img-top" alt="Tecnología 3" height="260">
+                    <div class="card-body">
+                        <h5 class="card-title">Control</h5>
+                        <p class="card-text">Interfaz sencilla y poderosa para un fácil control de clientes y ventas.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Funcionalidades del Django CRM -->
+    <div class="container-lg mt-5 mb-5">
+        <div class="text-center mb-4">
+            <h3 class="fw-bold">¿Qué puedes hacer con DjangoCRM?</h3>
+            <p class="lead">Explora las principales funcionalidades que ofrece nuestro sistema</p>
+        </div>
 
-{% if user.is_authenticated %}
+        <div class="row text-center">
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm dark-card">
+                    <div class="card-body">
+                        <i class="bi bi-person-check mb-3" style="font-size: 2rem;"></i>
+                        <h5 class="card-title">Gestión de Clientes</h5>
+                        <p class="card-text">Agrega, edita y visualiza tus clientes con facilidad. Lleva un registro
+                            detallado de toda la información relevante de cada cliente.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm dark-card">
+                    <div class="card-body">
+                        <i class="bi bi-bar-chart-line mb-3" style="font-size: 2rem;"></i>
+                        <h5 class="card-title">Control de Ventas</h5>
+                        <p class="card-text">Realiza un seguimiento completo de todas tus ventas. Registra cada
+                            transacción
+                            y obtén un resumen de ventas al final del día.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm dark-card">
+                    <div class="card-body">
+                        <i class="bi bi-box mb-3" style="font-size: 2rem;"></i>
+                        <h5 class="card-title">Gestión de Inventarios</h5>
+                        <p class="card-text">Mantén el control total de tu inventario, realiza ajustes, agrega productos
+                            nuevos y realiza ventas sin perder el seguimiento de tus existencias.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Testimonios -->
+    <div class="container-lg mt-5">
+        <div class="text-center mb-5">
+            <h3 class="fw-bold">Testimonios de Clientes</h3>
+            <p class="lead">Nuestros usuarios comparten sus experiencias con DjangoCRM</p>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            <div class="col">
+                <div class="card shadow-sm dark-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Gemma Suárez</h5>
+                        <p class="card-text">"DjangoCRM ha transformado completamente la forma en que gestiono mis
+                            clientes.
+                            Es intuitivo y extremadamente eficiente."</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card shadow-sm dark-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Lola Suárez</h5>
+                        <p class="card-text">"El sistema es muy fácil de usar y me ha permitido automatizar tareas que
+                            antes
+                            tomaban mucho tiempo."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br><br><br><br>
+    {% else %}
+    <!-- Si el usuario no está autenticado, mostrar el login -->
+    <div class="row justify-content-center mt-5">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card shadow-sm dark-card">
+                <div class="card-header text-center py-4">
+                    <h3 class="mb-0 fw-bold">
+                        <i class="bi bi-shield-lock me-2" style="color: var(--accent-blue);"></i>
+                        Acceso al Sistema
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label class="form-label">Usuario</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark-secondary border-dark">
+                                    <i class="bi bi-person"></i>
+                                </span>
+                                <input type="text" class="form-control bg-dark-primary border-dark" name="username"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Contraseña</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark-secondary border-dark">
+                                    <i class="bi bi-lock"></i>
+                                </span>
+                                <input type="password" class="form-control bg-dark-primary border-dark" name="password"
+                                    required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2"
+                            style="background-color: var(--accent-blue); border: none;">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Ingresar
+                        </button>
+                    </form>
+                    <div class="text-center mt-3">
+                        <small>¿No tienes cuenta?
+                            <a href="{% url 'register' %}" class="text-accent">Regístrate aquí</a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
 
-<table class="table table-striped table-hover table-bordered">
-  <thead class="table-dark">
-    <tr>
-      <th scope="col">Nombre</th>
-      <th scope="col">Email</th>
-      <th scope="col">Fono</th>
-      <th scope="col">Dirección</th>
-      <th scope="col">Ciudad</th>
-      <th scope="col">Creado en</th>
-      <th scope="col">ID</th>
-    </tr>
-  </thead>
-  <tbody>
-    
-{% if records %}
-	{% for record in records %}
-		<tr>
-			<td>{{ record.first_name }} {{ record.last_name }}</td>
-			<td>{{ record.email }}</td>
-			<td>{{ record.phone }}</td>
-			<td>{{ record.address }}</td>
-			<td>{{ record.city }}</td>
-			<td>{{ record.created_at }}</td>
-			<td><a href="{% url 'record' record.id %}">{{ record.id }}</a></td>
-		</tr>
-	{% endfor %}
-
-{% endif %}
-
-	
-	  </tbody>
-	</table>
-
-
-
-
-
-{% else %}
-
-<div class="col-md-6 offset-md-3">
-<h1>Login</h1>
-<br/>
-
-<form method="POST" action="{% url 'home' %}">
-	{% csrf_token %}
-
-  <div class="mb-3">
-    <input type="text" class="form-control" name="username", placeholder="Usuario" required>
-    
-  </div><br/>
-  <div class="mb-3">
-    <input type="password" class="form-control" name="password", placeholder="Contraseña" required>
-  </div>
-  <br/>
-  <button type="submit" class="btn btn-secondary">Ingresar</button>
-
-</form>
-
-
-
-{% endif %}
 
 {% endblock %}

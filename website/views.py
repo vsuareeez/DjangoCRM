@@ -60,9 +60,6 @@ def register_user(request):
     
 #CRUD
    
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from .models import Record
 
 def customer_record(request, pk):
     if request.user.is_authenticated:
@@ -78,7 +75,7 @@ def customer_record(request, pk):
         })
     else:
         messages.success(request, 'Tienes que ingresar')
-        return redirect('home')
+        return redirect('clientes')
      
 
 def delete_record(request, pk):
@@ -166,3 +163,21 @@ def dashboard(request):
     }
     
     return render(request, 'dashboard.html', context)
+
+def clientes(request):
+	records = Record.objects.all()
+	# Check to see if logging in
+	if request.method == 'POST':
+		username = request.POST['username']
+		password = request.POST['password']
+		# Authenticate
+		user = authenticate(request, username=username, password=password)
+		if user is not None:
+			login(request, user)
+			messages.success(request, "Has ingresado!")
+			return redirect('home')
+		else:
+			messages.success(request, "Hubo un error al ingresar, por favor intente de nuevo.")
+			return redirect('home')
+	else:
+		return render(request, 'clientes.html', {'records':records})
