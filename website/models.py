@@ -1,21 +1,27 @@
+from django.core.validators import RegexValidator
 from django.db import models
 from simple_history.models import HistoricalRecords
 from django.contrib.auth.models import User
 
-# Create your models here.
+
 class Record(models.Model):
+    phone_validator = RegexValidator(
+        regex=r'^\+?[\d\s\-()]{7,15}$',
+        message='Ingresa un número de teléfono válido (7 a 15 dígitos).',
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     first_name = models.CharField(max_length=50)
-    last_name =  models.CharField(max_length=50)
-    email =  models.CharField(max_length=100)
-    phone = models.CharField(max_length=15)
-    address =  models.CharField(max_length=100)
-    city =  models.CharField(max_length=50)
- 
+    last_name = models.CharField(max_length=50)
+    email = models.EmailField(max_length=100)
+    phone = models.CharField(max_length=15, validators=[phone_validator])
+    address = models.CharField(max_length=100)
+    city = models.CharField(max_length=50)
+
     history = HistoricalRecords()
-    
+
     def __str__(self):
-        return(f"{self.first_name} {self.last_name}")
+        return f"{self.first_name} {self.last_name}"
     
 class Note(models.Model):
     client = models.ForeignKey('Record', on_delete=models.CASCADE, related_name='notes')  # Relacionada con el cliente
