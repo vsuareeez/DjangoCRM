@@ -42,8 +42,14 @@
   </div>
 
   <br/><br/>
-  <a href="{% url 'home' %}" class="btn btn-secondary">Volver</a>
-  <a href="{% url 'delete_record' customer_record.id %}" class="btn btn-danger">Borrar</a>
-  <a href="{% url 'update_record' customer_record.id %}" class="btn btn-secondary">Actualizar Cliente</a>
+  <div class="d-flex gap-2">
+    <a href="{% url 'home' %}" class="btn btn-secondary">Volver</a>
+    <a href="{% url 'update_record' customer_record.id %}" class="btn btn-secondary">Actualizar Cliente</a>
+    <form method="POST" action="{% url 'delete_record' customer_record.id %}"
+          onsubmit="return confirm('¿Seguro que quieres borrar a {{ customer_record.first_name }} {{ customer_record.last_name }}?');">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Borrar</button>
+    </form>
+  </div>
 
 {% endblock %}

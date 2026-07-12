@@ -1,0 +1,4 @@
+Django>=5.1,<6.0
+django-simple-history>=3.7
+# Driver de MySQL (solo si usas MySQL; con DB_ENGINE=sqlite3 no es necesario)
+mysqlclient>=2.2

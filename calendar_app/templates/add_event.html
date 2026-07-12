@@ -18,17 +18,23 @@
         <!-- Formulario para agregar evento -->
         <form method="post">
             {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
             <div class="mb-3">
-                <label for="title" class="form-label">Título del Evento</label>
-                <input type="text" name="title" class="form-control" id="title" required>
+                <label for="title" class="form-label">{{ form.title.label }}</label>
+                {{ form.title }}
+                {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors }}</div>{% endif %}
             </div>
             <div class="mb-3">
-                <label for="description" class="form-label">Descripción</label>
-                <textarea name="description" class="form-control" id="description" rows="4" placeholder="Detalles del evento..."></textarea>
+                <label for="description" class="form-label">{{ form.description.label }}</label>
+                {{ form.description }}
+                {% if form.description.errors %}<div class="text-danger small">{{ form.description.errors }}</div>{% endif %}
             </div>
             <div class="mb-3">
-                <label for="date" class="form-label">Fecha</label>
-                <input type="text" name="date" class="form-control" id="date" value="{{ request.GET.date }}" readonly>
+                <label for="date" class="form-label">{{ form.date.label }}</label>
+                {{ form.date }}
+                {% if form.date.errors %}<div class="text-danger small">{{ form.date.errors }}</div>{% endif %}
             </div>
             <button type="submit" class="btn btn-success w-100">Agregar Evento</button>
         </form>
