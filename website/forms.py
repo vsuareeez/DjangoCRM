@@ -33,12 +33,15 @@ class SignUpForm(UserCreationForm):
 
 
 class AddRecordForm(forms.ModelForm):
-    first_name = forms.CharField(required=True, widget=forms.TextInput(attrs={"placeholder": "Primer Nombre", "class": "form-control"}), label="")
-    last_name = forms.CharField(required=True, widget=forms.TextInput(attrs={"placeholder": "Apellido", "class": "form-control"}), label="")
-    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={"placeholder": "Email", "class": "form-control"}), label="")
-    phone = forms.CharField(required=True, widget=forms.TextInput(attrs={"placeholder": "Fono", "class": "form-control"}), label="")
-    address = forms.CharField(required=True, widget=forms.TextInput(attrs={"placeholder": "Dirección", "class": "form-control"}), label="")
-    city = forms.CharField(required=True, widget=forms.TextInput(attrs={"placeholder": "Ciudad", "class": "form-control"}), label="")
+    field_class = 'form-control'
+
+    first_name = forms.CharField(required=True, widget=forms.TextInput(attrs={"placeholder": "Nombre", "class": field_class}), label="")
+    last_name = forms.CharField(required=True, widget=forms.TextInput(attrs={"placeholder": "Apellido", "class": field_class}), label="")
+    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={"placeholder": "Email", "class": field_class}), label="")
+    phone = forms.CharField(required=True, widget=forms.TextInput(attrs={"placeholder": "Fono", "class": field_class}), label="")
+    address = forms.CharField(required=True, widget=forms.TextInput(attrs={"placeholder": "Dirección", "class": field_class}), label="")
+    city = forms.CharField(required=True, widget=forms.TextInput(attrs={"placeholder": "Ciudad", "class": field_class}), label="")
+    image = forms.ImageField(required=False, widget=forms.ClearableFileInput(attrs={"class": "form-control"}), label="Foto del cliente")
 
     class Meta:
         model = Record

@@ -2,20 +2,20 @@
 {% block content %}
 
 <div class="col-md-6 offset-md-3">
-<h1>Añadir Cliente</h1>
-<br/>
+    <h1 class="fw-bold"><i class="bi bi-person-plus me-2" style="color: var(--accent-blue);"></i>Añadir Cliente</h1>
+    <br/>
 
-<form method="POST" action="{% url 'add_record' %}">
-	{% csrf_token %}
+    <form method="POST" action="{% url 'add_record' %}" enctype="multipart/form-data">
+        {% csrf_token %}
 
-	{{ form.as_p }}
+        {{ form.as_p }}
 
-<br/>
-  <button type="submit" class="btn btn-secondary">Añadir Cliente</button>
-   <a href="{% url 'home' %}" class="btn btn-secondary">Volver</a>
-
-</form>
-
+        <br/>
+        <button type="submit" class="btn btn-primary" style="background-color: var(--accent-blue); border: none;">
+            <i class="bi bi-check-lg me-2"></i>Añadir Cliente
+        </button>
+        <a href="{% url 'clientes' %}" class="btn btn-light">Volver</a>
+    </form>
 </div>
 
 {% endblock %}

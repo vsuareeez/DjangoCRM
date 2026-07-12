@@ -13,8 +13,7 @@ from .models import Record
 # Usuario
 
 def home(request):
-    records = Record.objects.all()
-    # Check to see if logging in
+    # Landing page + login; la lista de clientes vive en la vista 'clientes'
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -26,7 +25,7 @@ def home(request):
         else:
             messages.error(request, "Hubo un error al ingresar, por favor intente de nuevo.")
         return redirect('home')
-    return render(request, 'home.html', {'records': records})
+    return render(request, 'home.html')
 
 
 def logout_user(request):
@@ -49,6 +48,12 @@ def register_user(request):
 
 
 # CRUD
+
+@login_required
+def clientes(request):
+    records = Record.objects.all()
+    return render(request, 'clientes.html', {'records': records})
+
 
 @login_required
 def customer_record(request, pk):
@@ -82,11 +87,11 @@ def add_record(request):
         messages.error(request, "No tienes los permisos para añadir clientes.")
         return redirect('home')
     if request.method == "POST":
-        form = AddRecordForm(request.POST)
+        form = AddRecordForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             messages.success(request, "Nuevo cliente añadido exitosamente!")
-            return redirect('home')
+            return redirect('clientes')
     else:
         form = AddRecordForm()
     return render(request, 'add_record.html', {'form': form})
@@ -99,11 +104,11 @@ def update_record(request, pk):
         messages.error(request, "No tienes los permisos para actualizar clientes.")
         return redirect('record', pk=pk)
     if request.method == "POST":
-        form = AddRecordForm(request.POST, instance=record)
+        form = AddRecordForm(request.POST, request.FILES, instance=record)
         if form.is_valid():
             form.save()
             messages.success(request, "Cliente actualizado exitosamente!")
-            return redirect('home')
+            return redirect('record', pk=pk)
     else:
         form = AddRecordForm(instance=record)
     return render(request, 'update_record.html', {'form': form})

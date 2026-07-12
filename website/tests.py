@@ -38,6 +38,24 @@ class PublicViewsTest(TestCase):
         self.assertRedirects(response, reverse('home'))
 
 
+class ClientesViewTest(TestCase):
+    """La lista de clientes vive en /clientes/ (home ahora es landing)."""
+
+    def setUp(self):
+        self.record = make_record()
+        User.objects.create_user(username='vale', password='clave-segura-123')
+
+    def test_clientes_requiere_login(self):
+        response = self.client.get(reverse('clientes'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_clientes_muestra_registros(self):
+        self.client.login(username='vale', password='clave-segura-123')
+        response = self.client.get(reverse('clientes'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Juan')
+
+
 class AuthRequiredTest(TestCase):
     """Las vistas protegidas deben redirigir a home si no hay sesión."""
 
@@ -94,7 +112,7 @@ class PermissionsTest(TestCase):
             'address': 'Calle Falsa 123',
             'city': 'Santiago',
         })
-        self.assertRedirects(response, reverse('home'))
+        self.assertRedirects(response, reverse('record', args=[self.record.pk]))
         self.record.refresh_from_db()
         self.assertEqual(self.record.first_name, 'Juana')
 
