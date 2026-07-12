@@ -1,22 +1,22 @@
 {% extends 'base.html' %}
+{% block title %}Editar cliente · DCRM{% endblock %}
+
 {% block content %}
-
-<div class="col-md-6 offset-md-3">
-<h1>Add Record</h1>
-<br/>
-
-<form method="POST">
-	{% csrf_token %}
-
-	{{ form.as_p }}
-
-<br/>
-  <button type="submit" class="btn btn-secondary">Actualizar Cliente</button>
-  <button type="submit" class="btn btn-secondary">Volver</button>
-
-</form>
-
-
+<div class="d-flex justify-content-center">
+  <div style="width:100%;max-width:560px">
+    <div class="breadcrumb-lite"><a href="{% url 'record' form.instance.pk %}">← {{ form.instance.first_name }} {{ form.instance.last_name }}</a><span class="sep">/</span>Editar</div>
+    <h1 class="page-title mb-1" style="font-size:1.45rem">Editar cliente</h1>
+    <p class="page-sub mb-3">Los cambios quedan registrados en el historial.</p>
+    <div class="card"><div class="card-body p-4">
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% include 'record_form_fields.html' %}
+        <div class="d-flex gap-2 justify-content-end">
+          <a href="{% url 'record' form.instance.pk %}" class="btn btn-outline-secondary">Cancelar</a>
+          <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        </div>
+      </form>
+    </div></div>
+  </div>
 </div>
-
 {% endblock %}

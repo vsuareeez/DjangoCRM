@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load ui %}
+{% block title %}Clientes · DCRM{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
+  <div>
+    <h1 class="page-title mb-1">Clientes</h1>
+    <div class="page-sub">{{ total_count }} cliente{{ total_count|pluralize }} en total · {{ new_this_month }} nuevo{{ new_this_month|pluralize }} este mes</div>
+  </div>
+  <a href="{% url 'add_record' %}" class="btn btn-primary">+ Añadir cliente</a>
+</div>
+
+{% if total_count == 0 %}
+<div class="card mt-3"><div class="card-body">
+  <div class="empty-state">
+    <div class="empty-icon" aria-hidden="true">👥</div>
+    <h2 class="empty-title">Aún no tienes clientes</h2>
+    <p class="empty-text">Agrega tu primer cliente para empezar a organizar tu cartera.</p>
+    <a href="{% url 'add_record' %}" class="btn btn-primary">+ Añadir cliente</a>
+  </div>
+</div></div>
+{% else %}
+<div class="card mt-3">
+  <div class="card-toolbar">
+    <div class="input-icon flex-grow-1" style="max-width:320px">
+      <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="6" cy="6" r="4.5" fill="none" stroke="#8b99b0" stroke-width="1.5"/><line x1="9.5" y1="9.5" x2="13" y2="13" stroke="#8b99b0" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <input class="form-control" id="buscar" type="search" placeholder="Buscar por nombre, email o ciudad…" aria-label="Buscar clientes">
+    </div>
+    <select class="form-select w-auto" id="ciudad" aria-label="Filtrar por ciudad">
+      <option value="">Todas las ciudades</option>
+      {% for ciudad in cities %}<option>{{ ciudad }}</option>{% endfor %}
+    </select>
+  </div>
+
+  <!-- Escritorio: tabla (oculta bajo md) -->
+  <div class="table-responsive d-none d-md-block">
+    <table class="table table-hover table-dcrm align-middle">
+      <thead><tr>
+        <th scope="col">Cliente</th><th scope="col">Fono</th><th scope="col">Ciudad</th><th scope="col">Creado</th>
+        <th scope="col"><span class="visually-hidden">Acciones</span></th>
+      </tr></thead>
+      <tbody>
+        {% for record in page_obj %}
+        <tr data-buscar="{{ record.first_name|lower }} {{ record.last_name|lower }} {{ record.email|lower }} {{ record.city|lower }}" data-ciudad="{{ record.city }}">
+          <td><div class="d-flex align-items-center gap-3"><span class="avatar avatar-{{ record.pk|tint }}">{{ record|initials }}</span><div><div class="client-name">{{ record.first_name }} {{ record.last_name }}</div><div class="client-email">{{ record.email|default:"—" }}</div></div></div></td>
+          <td class="num">{{ record.phone|default:"—" }}</td><td>{{ record.city|default:"—" }}</td><td class="text-muted-2">{{ record.created_at|date:"j M Y" }}</td>
+          <td class="text-end"><a class="link-action" href="{% url 'record' record.pk %}">Ver ficha</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Móvil: cards apiladas (ocultas en md+) -->
+  <div class="client-cards d-md-none p-3">
+    {% for record in page_obj %}
+    <a class="client-card" href="{% url 'record' record.pk %}" data-buscar="{{ record.first_name|lower }} {{ record.last_name|lower }} {{ record.email|lower }} {{ record.city|lower }}" data-ciudad="{{ record.city }}">
+      <div class="d-flex align-items-center gap-2">
+        <span class="avatar avatar-{{ record.pk|tint }}" style="width:36px;height:36px">{{ record|initials }}</span>
+        <div class="flex-grow-1 overflow-hidden"><div class="client-name">{{ record.first_name }} {{ record.last_name }}</div><div class="client-email text-truncate">{{ record.email|default:"—" }}</div></div>
+        <span class="chev">›</span>
+      </div>
+      <div class="client-card-foot"><span class="num">{{ record.phone|default:"—" }}</span><span>·</span><span>{{ record.city|default:"—" }}</span><span class="ms-auto">{{ record.created_at|date:"j M" }}</span></div>
+    </a>
+    {% endfor %}
+  </div>
+
+  <div class="card-footer-bar">
+    <span id="resumen">Mostrando {{ page_obj.start_index }}–{{ page_obj.end_index }} de {{ total_count }}</span>
+    {% if page_obj.paginator.num_pages > 1 %}
+    <nav aria-label="Paginación de clientes">
+      <ul class="pagination">
+        <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+          <a class="page-link" href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% else %}#{% endif %}" aria-label="Anterior">‹</a>
+        </li>
+        {% for num in page_obj.paginator.page_range %}
+        <li class="page-item {% if num == page_obj.number %}active{% endif %}" {% if num == page_obj.number %}aria-current="page"{% endif %}>
+          <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        </li>
+        {% endfor %}
+        <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+          <a class="page-link" href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% else %}#{% endif %}" aria-label="Siguiente">›</a>
+        </li>
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if total_count %}
+<script>
+// Filtro client-side sobre la página actual; a futuro: ?q= y ?ciudad= en la vista.
+const buscar = document.getElementById('buscar'), ciudad = document.getElementById('ciudad');
+const resumenInicial = document.getElementById('resumen').textContent;
+function filtrar(){
+  const q = buscar.value.toLowerCase().trim(), c = ciudad.value;
+  let visibles = 0;
+  document.querySelectorAll('[data-buscar]').forEach(el => {
+    const ok = el.dataset.buscar.includes(q) && (!c || el.dataset.ciudad === c);
+    el.hidden = !ok; if (ok) visibles++;
+  });
+  document.getElementById('resumen').textContent =
+    (q || c) ? `${visibles / 2} resultado(s)` : resumenInicial;
+}
+buscar.addEventListener('input', filtrar);
+ciudad.addEventListener('change', filtrar);
+</script>
+{% endif %}
+{% endblock %}

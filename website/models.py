@@ -6,17 +6,18 @@ from django.contrib.auth.models import User
 
 class Record(models.Model):
     phone_validator = RegexValidator(
-        regex=r'^\+?[\d\s\-()]{7,15}$',
+        regex=r'^\+?[\d\s\-()]{7,19}$',
         message='Ingresa un número de teléfono válido (7 a 15 dígitos).',
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    email = models.EmailField(max_length=100)
-    phone = models.CharField(max_length=15, validators=[phone_validator])
-    address = models.CharField(max_length=100)
-    city = models.CharField(max_length=50)
+    email = models.EmailField(max_length=100, blank=True)
+    phone = models.CharField(max_length=20, blank=True, validators=[phone_validator])
+    address = models.CharField(max_length=100, blank=True)
+    city = models.CharField(max_length=50, blank=True)
+    image = models.ImageField(upload_to='customer_images/', blank=True, null=True)
 
     history = HistoricalRecords()
 

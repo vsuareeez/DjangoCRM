@@ -1,100 +1,115 @@
 {% extends 'base.html' %}
+{% block title %}Dashboard · DCRM{% endblock %}
+
 {% block content %}
-<div class="container">
-    <h2>Dashboard</h2>
-    <br><br>
-    
-    <div class="row">
-        <!-- Gráfico de Clientes por Ciudad -->
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Clientes por Ciudad</h5>
-                    <canvas id="cityChart"></canvas>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Gráfico de Registros Mensuales -->
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Registros Mensuales</h5>
-                    <canvas id="monthlyChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="col-md-12 mt-4">
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">Tendencia de Crecimiento</h5>
-            <canvas id="trendChart"></canvas>
-        </div>
-    </div>
+<h1 class="page-title mb-1">Dashboard</h1>
+<div class="page-sub mb-3">Resumen de tu cartera al {% now "j \d\e F \d\e Y" %}</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body">
+    <div class="kpi-label">Clientes totales</div><div class="kpi-value">{{ total_count }}</div>
+    {% if new_this_month %}<div class="kpi-delta up">▲ {{ new_this_month }} este mes</div>{% else %}<div class="kpi-delta">Sin cambios este mes</div>{% endif %}
+  </div></div></div>
+  <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body">
+    <div class="kpi-label">Nuevos este mes</div><div class="kpi-value">{{ new_this_month }}</div>
+    <div class="kpi-delta">vs. {{ prev_month_count }} en {{ prev_month_name }}</div>
+  </div></div></div>
+  <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body">
+    <div class="kpi-label">Ciudades</div><div class="kpi-value">{{ cities_count }}</div>
+    {% if top_city %}<div class="kpi-delta">{{ top_city.city }} concentra {{ top_city.count }}</div>{% else %}<div class="kpi-delta">—</div>{% endif %}
+  </div></div></div>
+  <div class="col-6 col-lg-3"><div class="card h-100"><div class="card-body">
+    <div class="kpi-label">Eventos próximos</div><div class="kpi-value">{{ upcoming_events }}</div>
+    <div class="kpi-delta"><a href="{% url 'calendar' %}">Ver calendario →</a></div>
+  </div></div></div>
 </div>
 
-<!-- Incluir Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% if total_count == 0 %}
+<div class="card"><div class="card-body">
+  <div class="empty-state">
+    <div class="empty-icon" aria-hidden="true">📊</div>
+    <h2 class="empty-title">Nada que graficar todavía</h2>
+    <p class="empty-text">Cuando agregues clientes verás aquí su distribución por ciudad y su evolución mensual.</p>
+    <a href="{% url 'add_record' %}" class="btn btn-primary">+ Añadir cliente</a>
+  </div>
+</div></div>
+{% else %}
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="card h-100"><div class="card-body p-4">
+      <div class="fw-semibold" style="font-size:.875rem">Clientes por ciudad</div>
+      <div class="text-muted-3 mb-3" style="font-size:.78rem">Distribución actual</div>
+      <div class="chart-box"><canvas id="chartCiudades" aria-label="Gráfico de clientes por ciudad" role="img"></canvas></div>
+    </div></div>
+  </div>
+  <div class="col-lg-7">
+    <div class="card h-100"><div class="card-body p-4">
+      <div class="fw-semibold" style="font-size:.875rem">Registros por mes</div>
+      <div class="text-muted-3 mb-3" style="font-size:.78rem">Últimos 6 meses</div>
+      <div class="chart-box"><canvas id="chartMeses" aria-label="Gráfico de registros por mes" role="img"></canvas></div>
+    </div></div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
 
+{% block extra_js %}
+{% if total_count %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+{{ cities_labels|json_script:"cities-labels" }}
+{{ cities_counts|json_script:"cities-counts" }}
+{{ monthly_labels|json_script:"monthly-labels" }}
+{{ monthly_counts|json_script:"monthly-counts" }}
 <script>
-    // Gráfico de Ciudades
-    const cityCtx = document.getElementById('cityChart').getContext('2d');
-    new Chart(cityCtx, {
-        type: 'pie',
-        data: {
-            labels: {{ cities|safe }},
-            datasets: [{
-                data: {{ city_counts|safe }},
-                backgroundColor: [
-                    '#FF6384',
-                    '#36A2EB',
-                    '#FFCE56',
-                    '#4BC0C0',
-                    '#9966FF'
-                ]
-            }]
-        }
-    });
+const leer = id => JSON.parse(document.getElementById(id).textContent);
+const css = getComputedStyle(document.documentElement);
+const C = n => css.getPropertyValue(n).trim();
+Chart.defaults.font.family = css.getPropertyValue('--dcrm-font');
+Chart.defaults.font.size = 12;
+Chart.defaults.color = C('--dcrm-text-2');
 
-    // Gráfico Mensual
-    const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
-    new Chart(monthlyCtx, {
-        type: 'bar',
-        data: {
-            labels: {{ months|safe }},
-            datasets: [{
-                label: 'Registros por Mes',
-                data: {{ monthly_counts|safe }},
-                backgroundColor: '#36A2EB'
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-    // Gráfico de tendencia
-    const trendCtx = document.getElementById('trendChart').getContext('2d');
-    new Chart(trendCtx, {
-    type: 'line',
-    data: {
-        labels: {{ months|safe }},
-        datasets: [{
-            label: 'Crecimiento de Clientes',
-            data: {{ monthly_counts|safe }},
-            borderColor: '#4BC0C0',
-            tension: 0.1
-            }]
-        }
-    });
+const paleta = ['--dcrm-chart-1','--dcrm-chart-2','--dcrm-chart-3','--dcrm-chart-4','--dcrm-chart-5','--dcrm-chart-6'];
+const ciudadesLabels = leer('cities-labels');
 
+new Chart(document.getElementById('chartCiudades'), {
+  type: 'doughnut',
+  data: {
+    labels: ciudadesLabels,
+    datasets: [{
+      data: leer('cities-counts'),
+      backgroundColor: ciudadesLabels.map((_, i) => C(paleta[i % paleta.length])),
+      borderColor: '#fff', borderWidth: 2
+    }]
+  },
+  options: {
+    maintainAspectRatio: false, cutout: '68%',
+    plugins: { legend: { position: 'right', labels: { boxWidth: 10, boxHeight: 10, useBorderRadius: true, borderRadius: 3, padding: 12 } } }
+  }
+});
+
+const mesesCounts = leer('monthly-counts');
+new Chart(document.getElementById('chartMeses'), {
+  type: 'bar',
+  data: {
+    labels: leer('monthly-labels'),
+    datasets: [{
+      data: mesesCounts,
+      // Mes actual en primary, el resto en tonos claros
+      backgroundColor: mesesCounts.map((_, i) =>
+        i === mesesCounts.length - 1 ? C('--dcrm-chart-1') :
+        i === mesesCounts.length - 2 ? '#6d9df5' : '#c6d5f8'),
+      borderRadius: 6, maxBarThickness: 44
+    }]
+  },
+  options: {
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#eef1f7' }, border: { display: false } },
+      x: { grid: { display: false }, border: { display: false } }
+    }
+  }
+});
 </script>
-<br/><br/>
-<a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
-<br/><br/>
+{% endif %}
 {% endblock %}

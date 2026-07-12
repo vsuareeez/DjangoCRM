@@ -1,77 +1,48 @@
-<!DOCTYPE html>
-<html lang="es">
+{% extends 'base.html' %}
+{% block title %}Calendario · DCRM{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendario de Eventos</title>
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@3.10.2/dist/fullcalendar.min.css">
+{% endblock %}
 
-    <!-- Bootstrap y FullCalendar -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@3.2.0/dist/fullcalendar.min.css" rel="stylesheet">
+{% block content %}
+<div class="d-flex align-items-start justify-content-between gap-3 flex-wrap mb-3">
+  <div>
+    <h1 class="page-title mb-1">Calendario</h1>
+    <div class="page-sub">{{ events_this_month }} evento{{ events_this_month|pluralize }} este mes</div>
+  </div>
+  <a href="{% url 'add_event' %}" class="btn btn-primary">+ Agregar evento</a>
+</div>
+{% if not has_events %}
+<div class="card mb-3"><div class="card-body">
+  <div class="empty-state">
+    <div class="empty-icon" aria-hidden="true">📅</div>
+    <h2 class="empty-title">Sin eventos programados</h2>
+    <p class="empty-text">Agrega tu primer evento para organizar reuniones y recordatorios.</p>
+    <a href="{% url 'add_event' %}" class="btn btn-primary">+ Agregar evento</a>
+  </div>
+</div></div>
+{% endif %}
+<div class="card"><div class="card-body p-3 p-md-4">
+  <div id="calendar"></div>
+</div></div>
+{% endblock %}
 
-    <!-- Estilos personalizados -->
-    <style>
-        body {
-            background-color: #f8f9fa;
-            color: #495057;
-        }
-
-        .container {
-            max-width: 1200px;
-        }
-
-        #calendar {
-            margin-top: 20px;
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="container mt-5">
-        <!-- Título y botón de agregar evento -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>Calendario de Eventos</h1>
-            <a href="{% url 'add_event' %}" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Agregar Evento
-            </a>
-        </div>
-
-        <!-- Calendario -->
-        <div id="calendar"></div>
-    </div>
-
-    <!-- Bootstrap, jQuery y FullCalendar -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@3.2.0/dist/fullcalendar.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Script para cargar el calendario -->
-    <script>
-        $(document).ready(function () {
-            $('#calendar').fullCalendar({
-                header: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'month,agendaWeek,agendaDay'
-                },
-                events: {{ events|safe }}, // Cargar eventos desde Django
-                dayClick: function (date, jsEvent, view) {
-                    var fecha = date.format();
-                    if (confirm('¿Has fumado este día?')) {
-                        window.location.href = "{% url 'add_event' %}?date=" + fecha;
-                    }
-                },
-                eventClick: function (calEvent, jsEvent, view) {
-                    alert('Evento: ' + calEvent.title);
-                }
-            });
-        });
-    </script>
-</body>
-
-</html>
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@3.10.2/dist/fullcalendar.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@3.10.2/dist/locale/es.js"></script>
+{{ events|json_script:"calendar-events" }}
+<script>
+$('#calendar').fullCalendar({
+  locale: 'es',
+  firstDay: 1,
+  height: 'auto',
+  header: { left: 'prev,next today', center: 'title', right: 'month,agendaWeek,agendaDay' },
+  timeFormat: 'H:mm',
+  eventLimit: true,
+  events: JSON.parse(document.getElementById('calendar-events').textContent)
+});
+</script>
+{% endblock %}

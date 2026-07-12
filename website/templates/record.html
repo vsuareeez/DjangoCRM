@@ -1,55 +1,87 @@
 {% extends 'base.html' %}
+{% load ui %}
+{% block title %}{{ customer_record.first_name }} {{ customer_record.last_name }} · DCRM{% endblock %}
 
 {% block content %}
-  <div class="card">
-    <div class="card-header">
-      <strong>{{ customer_record.first_name }} {{ customer_record.last_name }}</strong>
-    </div>
-    <div class="card-body">
-      <p class="card-text">
-        <strong>Email: </strong>{{ customer_record.email }}
-      </p>
-      <p class="card-text">
-        <strong>Fono: </strong>{{ customer_record.phone }}
-      </p>
-      <p class="card-text">
-        <strong>Dirección: </strong>{{ customer_record.address }}
-      </p>
-      <p class="card-text">
-        <strong>Ciudad: </strong>{{ customer_record.city }}
-      </p>
-      <p class="card-text">
-        <strong>Creado en: </strong>{{ customer_record.created_at }}
-      </p>
-      <p class="card-text">
-        <strong>ID: </strong>{{ customer_record.id }}
-      </p>
+<div class="breadcrumb-lite"><a href="{% url 'clientes' %}">← Clientes</a><span class="sep">/</span>{{ customer_record.first_name }} {{ customer_record.last_name }}</div>
 
-      <!-- Mostrar las notas asociadas -->
-      <h3>Notas:</h3>
-      <ul>
-        {% for note in notes %}
-          <li>
-            <strong>{{ note.author.username }}</strong> - {{ note.created_at }}<br>
-            {{ note.content }}
-          </li>
-        {% empty %}
-          <li>No hay notas para este cliente.</li>
-        {% endfor %}
-      </ul>
-
+<div class="d-flex align-items-center justify-content-between gap-3 flex-wrap mb-3">
+  <div class="d-flex align-items-center gap-3">
+    {% if customer_record.image %}
+    <span class="avatar avatar-{{ customer_record.pk|tint }} avatar-lg overflow-hidden"><img src="{{ customer_record.image.url }}" alt="Foto de {{ customer_record.first_name }}" class="w-100 h-100 object-fit-cover"></span>
+    {% else %}
+    <span class="avatar avatar-{{ customer_record.pk|tint }} avatar-lg">{{ customer_record|initials }}</span>
+    {% endif %}
+    <div>
+      <h1 class="page-title" style="font-size:1.45rem">{{ customer_record.first_name }} {{ customer_record.last_name }}</h1>
+      <div class="page-sub">Cliente desde el {{ customer_record.created_at|date:"j \d\e F \d\e Y" }} · ID {{ customer_record.pk }}</div>
     </div>
   </div>
-
-  <br/><br/>
   <div class="d-flex gap-2">
-    <a href="{% url 'home' %}" class="btn btn-secondary">Volver</a>
-    <a href="{% url 'update_record' customer_record.id %}" class="btn btn-secondary">Actualizar Cliente</a>
-    <form method="POST" action="{% url 'delete_record' customer_record.id %}"
-          onsubmit="return confirm('¿Seguro que quieres borrar a {{ customer_record.first_name }} {{ customer_record.last_name }}?');">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-danger">Borrar</button>
-    </form>
+    <a href="{% url 'update_record' customer_record.pk %}" class="btn btn-outline-secondary">Editar</a>
+    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalBorrar">Borrar</button>
   </div>
+</div>
 
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card"><div class="card-body p-4">
+      <div class="section-label mb-3">Datos de contacto</div>
+      <dl class="datos-list mb-0">
+        <dt>Email</dt><dd>{% if customer_record.email %}<a class="text-decoration-none fw-medium" href="mailto:{{ customer_record.email }}">{{ customer_record.email }}</a>{% else %}—{% endif %}</dd>
+        <dt>Fono</dt><dd class="num">{{ customer_record.phone|default:"—" }}</dd>
+        <dt>Dirección</dt><dd>{{ customer_record.address|default:"—" }}</dd>
+        <dt>Ciudad</dt><dd>{{ customer_record.city|default:"—" }}</dd>
+        <dt>Registrado</dt><dd>{{ customer_record.created_at|date:"j M Y, H:i" }}</dd>
+      </dl>
+    </div></div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card"><div class="card-body p-4">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div class="section-label">Notas {% if notes %}<span class="text-muted-3 fw-medium text-lowercase" style="letter-spacing:0">· {{ notes|length }}</span>{% endif %}</div>
+      </div>
+      {% if notes %}
+      <div class="d-grid gap-2 mb-3">
+        {% for note in notes %}
+        <div class="note-card">
+          <div class="note-text">{{ note.content }}</div>
+          <div class="note-meta">{{ note.author.username|default:"—" }} · {{ note.created_at|date:"j M, H:i" }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-inline mb-3">Sin notas todavía. Escribe la primera para recordar lo importante de este cliente.</div>
+      {% endif %}
+      <form method="POST" action="{% url 'add_note' customer_record.pk %}" class="d-flex gap-2 align-items-start">
+        {% csrf_token %}
+        <label class="visually-hidden" for="nota">Nueva nota</label>
+        <textarea class="form-control" id="nota" name="content" rows="1" placeholder="Escribe una nota…" style="resize:none" required></textarea>
+        <button type="submit" class="btn btn-primary flex-shrink-0">Guardar</button>
+      </form>
+    </div></div>
+  </div>
+</div>
+
+<!-- Modal de confirmación de borrado -->
+<div class="modal fade" id="modalBorrar" tabindex="-1" aria-labelledby="modalBorrarTitulo" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalBorrarTitulo">¿Borrar a {{ customer_record.first_name }} {{ customer_record.last_name }}?</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body text-muted-2" style="font-size:.875rem">
+        Se eliminará la ficha{% if notes %} y sus {{ notes|length }} nota{{ notes|length|pluralize }}{% endif %}. Esta acción no se puede deshacer.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <form method="POST" action="{% url 'delete_record' customer_record.pk %}" class="m-0">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Borrar cliente</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

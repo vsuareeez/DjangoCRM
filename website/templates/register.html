@@ -1,27 +1,58 @@
 {% extends 'base.html' %}
-{% block content %}
-<div class="col-md-6 offset-md-3">
-    <br><br>
-<h1>Registrarse</h1>
-<br/>
+{% block title %}Registrarse · DCRM{% endblock %}
 
-<form method="POST" action="">
-    {% csrf_token %}
-    {% if form.errors %}
-			<div class="alert alert-warning alert-dismissible fade show" role="alert">
-			  Your Form Has Errors
-			  {% for field in form %}
-			  	{% if field.errors %}
-			  		{{ field.errors }}
-			  	{% endif %}
-			  {% endfor %}
-			  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-			</div>
-		{% endif %}
-    {{ form.as_p }}
-    <br/>
-        <button type="submit" class="btn btn-secondary">
-        Registrarse</button>
-    </form>
-</div>
+{% block main %}
+<main class="auth-main">
+  <div class="auth-wrap wide">
+    {% include 'flashes.html' %}
+    <h1 class="auth-title">Crea tu cuenta</h1>
+    <p class="auth-sub">Empieza a organizar tus clientes hoy</p>
+    <div class="card"><div class="card-body p-4">
+      <form method="POST">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">
+          <span class="alert-dot" aria-hidden="true">!</span>{{ form.non_field_errors|join:" " }}
+        </div>
+        {% endif %}
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.username.id_for_label }}">Usuario <span class="req">*</span></label>
+          {{ form.username }}
+          {% if form.username.errors %}<div class="invalid-feedback d-block">{{ form.username.errors|join:" " }}</div>{% endif %}
+          <div class="form-text">Solo letras, dígitos y @ . + - _</div>
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-6">
+            <label class="form-label" for="{{ form.first_name.id_for_label }}">Nombre</label>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}<div class="invalid-feedback d-block">{{ form.first_name.errors|join:" " }}</div>{% endif %}
+          </div>
+          <div class="col-6">
+            <label class="form-label" for="{{ form.last_name.id_for_label }}">Apellido</label>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}<div class="invalid-feedback d-block">{{ form.last_name.errors|join:" " }}</div>{% endif %}
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.email.id_for_label }}">Email</label>
+          {{ form.email }}
+          {% if form.email.errors %}<div class="invalid-feedback d-block">{{ form.email.errors|join:" " }}</div>{% endif %}
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.password1.id_for_label }}">Contraseña <span class="req">*</span></label>
+          {{ form.password1 }}
+          {% if form.password1.errors %}<div class="invalid-feedback d-block">{{ form.password1.errors|join:" " }}</div>{% endif %}
+          <div class="form-text">Mínimo 8 caracteres. Evita datos personales o claves comunes.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.password2.id_for_label }}">Confirmar contraseña <span class="req">*</span></label>
+          {{ form.password2 }}
+          {% if form.password2.errors %}<div class="invalid-feedback d-block">{{ form.password2.errors|join:" " }}</div>{% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Crear cuenta</button>
+      </form>
+    </div></div>
+    <p class="auth-foot">¿Ya tienes cuenta? <a class="fw-semibold text-decoration-none" href="{% url 'home' %}">Ingresa</a></p>
+  </div>
+</main>
 {% endblock %}
