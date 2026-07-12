@@ -31,7 +31,13 @@ class PublicViewsTest(TestCase):
     def test_login_valido(self):
         User.objects.create_user(username='vale', password='clave-segura-123')
         response = self.client.post(reverse('home'), {'username': 'vale', 'password': 'clave-segura-123'})
-        self.assertRedirects(response, reverse('home'))
+        self.assertRedirects(response, reverse('clientes'))
+
+    def test_home_autenticado_redirige_a_clientes(self):
+        User.objects.create_user(username='vale', password='clave-segura-123')
+        self.client.login(username='vale', password='clave-segura-123')
+        response = self.client.get(reverse('home'))
+        self.assertRedirects(response, reverse('clientes'))
 
     def test_login_invalido_redirige_a_home(self):
         response = self.client.post(reverse('home'), {'username': 'nadie', 'password': 'mala'})
@@ -93,7 +99,7 @@ class PermissionsTest(TestCase):
     def test_admin_puede_borrar(self):
         self.client.login(username='admin1', password='clave-segura-123')
         response = self.client.post(reverse('delete_record', args=[self.record.pk]))
-        self.assertRedirects(response, reverse('home'))
+        self.assertRedirects(response, reverse('clientes'))
         self.assertFalse(Record.objects.filter(pk=self.record.pk).exists())
 
     def test_borrar_por_get_no_permitido(self):
@@ -119,7 +125,32 @@ class PermissionsTest(TestCase):
     def test_viewer_no_puede_agregar(self):
         self.client.login(username='viewer1', password='clave-segura-123')
         response = self.client.get(reverse('add_record'))
-        self.assertRedirects(response, reverse('home'))
+        self.assertRedirects(response, reverse('clientes'))
+
+
+class NotesTest(TestCase):
+    def setUp(self):
+        self.record = make_record()
+        self.user = User.objects.create_user(username='vale', password='clave-segura-123')
+
+    def test_agregar_nota(self):
+        self.client.login(username='vale', password='clave-segura-123')
+        response = self.client.post(reverse('add_note', args=[self.record.pk]), {'content': 'Llamar el viernes'})
+        self.assertRedirects(response, reverse('record', args=[self.record.pk]))
+        self.assertEqual(self.record.notes.count(), 1)
+        nota = self.record.notes.first()
+        self.assertEqual(nota.content, 'Llamar el viernes')
+        self.assertEqual(nota.author, self.user)
+
+    def test_nota_vacia_no_se_guarda(self):
+        self.client.login(username='vale', password='clave-segura-123')
+        self.client.post(reverse('add_note', args=[self.record.pk]), {'content': '   '})
+        self.assertEqual(self.record.notes.count(), 0)
+
+    def test_agregar_nota_requiere_login(self):
+        response = self.client.post(reverse('add_note', args=[self.record.pk]), {'content': 'hola'})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(self.record.notes.count(), 0)
 
 
 class FormsTest(TestCase):

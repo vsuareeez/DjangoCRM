@@ -5,9 +5,10 @@ from .models import Record
 
 
 class SignUpForm(UserCreationForm):
-    email = forms.EmailField(label="", widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}))
-    first_name = forms.CharField(label="", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre'}))
-    last_name = forms.CharField(label="", max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellido'}))
+    # Los labels y textos de ayuda viven en register.html (rediseño DCRM)
+    email = forms.EmailField(required=False, widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'camila@ejemplo.cl', 'autocomplete': 'email'}))
+    first_name = forms.CharField(required=False, max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Camila', 'autocomplete': 'given-name'}))
+    last_name = forms.CharField(required=False, max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Araya', 'autocomplete': 'family-name'}))
 
     class Meta:
         model = User
@@ -16,32 +17,23 @@ class SignUpForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['username'].widget.attrs['class'] = 'form-control'
-        self.fields['username'].widget.attrs['placeholder'] = 'Usuario'
-        self.fields['username'].label = ''
-        self.fields['username'].help_text = '<span class="form-text text-muted"><small>Requerido. Máximo 150 caracteres. Solo letras, dígitos y @/./+/-/_.</small></span>'
-
-        self.fields['password1'].widget.attrs['class'] = 'form-control'
-        self.fields['password1'].widget.attrs['placeholder'] = 'Contraseña'
-        self.fields['password1'].label = ''
-        self.fields['password1'].help_text = '<ul class="form-text text-muted small"><li>Tu contraseña no puede ser muy similar a tu información personal.</li><li>Debe contener al menos 8 caracteres.</li><li>No puede ser una contraseña de uso común.</li><li>No puede ser completamente numérica.</li></ul>'
-
-        self.fields['password2'].widget.attrs['class'] = 'form-control'
-        self.fields['password2'].widget.attrs['placeholder'] = 'Confirme contraseña'
-        self.fields['password2'].label = ''
-        self.fields['password2'].help_text = '<span class="form-text text-muted"><small>Ingresa de nuevo la contraseña.</small></span>'
+        self.fields['username'].widget.attrs.update({'class': 'form-control', 'placeholder': 'camila.a', 'autocomplete': 'username'})
+        self.fields['username'].help_text = ''
+        self.fields['password1'].widget.attrs.update({'class': 'form-control', 'placeholder': '••••••••', 'autocomplete': 'new-password'})
+        self.fields['password1'].help_text = ''
+        self.fields['password2'].widget.attrs.update({'class': 'form-control', 'placeholder': '••••••••', 'autocomplete': 'new-password'})
+        self.fields['password2'].help_text = ''
 
 
 class AddRecordForm(forms.ModelForm):
-    field_class = 'form-control'
-
-    first_name = forms.CharField(required=True, widget=forms.TextInput(attrs={"placeholder": "Nombre", "class": field_class}), label="")
-    last_name = forms.CharField(required=True, widget=forms.TextInput(attrs={"placeholder": "Apellido", "class": field_class}), label="")
-    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={"placeholder": "Email", "class": field_class}), label="")
-    phone = forms.CharField(required=True, widget=forms.TextInput(attrs={"placeholder": "Fono", "class": field_class}), label="")
-    address = forms.CharField(required=True, widget=forms.TextInput(attrs={"placeholder": "Dirección", "class": field_class}), label="")
-    city = forms.CharField(required=True, widget=forms.TextInput(attrs={"placeholder": "Ciudad", "class": field_class}), label="")
-    image = forms.ImageField(required=False, widget=forms.ClearableFileInput(attrs={"class": "form-control"}), label="Foto del cliente")
+    # Solo nombre y apellido son obligatorios (regla del rediseño)
+    first_name = forms.CharField(required=True, widget=forms.TextInput(attrs={"placeholder": "María", "class": "form-control"}))
+    last_name = forms.CharField(required=True, widget=forms.TextInput(attrs={"placeholder": "González", "class": "form-control"}))
+    email = forms.EmailField(required=False, widget=forms.EmailInput(attrs={"placeholder": "maria@ejemplo.cl", "class": "form-control"}))
+    phone = forms.CharField(required=False, widget=forms.TextInput(attrs={"placeholder": "+56 9 1234 5678", "class": "form-control", "type": "tel"}))
+    address = forms.CharField(required=False, widget=forms.TextInput(attrs={"placeholder": "Calle, número, depto", "class": "form-control"}))
+    city = forms.CharField(required=False, widget=forms.TextInput(attrs={"placeholder": "Santiago", "class": "form-control"}))
+    image = forms.ImageField(required=False, widget=forms.ClearableFileInput(attrs={"class": "form-control"}))
 
     class Meta:
         model = Record

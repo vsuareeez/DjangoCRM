@@ -1,4 +1,4 @@
-import json
+from datetime import date
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -12,8 +12,15 @@ from .models import Event
 def event_calendar(request):
     events = Event.objects.all()
     events_list = [{'title': event.title, 'start': event.date.strftime('%Y-%m-%d')} for event in events]
-    events_json = json.dumps(events_list)
-    return render(request, 'calendar.html', {'events': events_json})
+
+    hoy = date.today()
+    events_this_month = Event.objects.filter(date__year=hoy.year, date__month=hoy.month).count()
+
+    return render(request, 'calendar.html', {
+        'events': events_list,
+        'events_this_month': events_this_month,
+        'has_events': events.exists(),
+    })
 
 
 @login_required
